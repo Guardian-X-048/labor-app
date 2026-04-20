@@ -3,6 +3,21 @@ import 'package:flutter/material.dart';
 class JobListScreen extends StatelessWidget {
   const JobListScreen({super.key});
 
+  static const Map<String, String> _jobEmojis = {
+    'Mason': '🧱',
+    'Plumber': '🔧',
+    'Painter': '🎨',
+    'Electrician Helper': '💡',
+    'Tiles Installer': '🟫',
+    'Carpenter': '🪚',
+    'Welder': '🔥',
+    'Site Cleaner': '🧹',
+    'Scaffolding Worker': '🏗️',
+    'Driver (Material Supply)': '🚚',
+    'Concrete Mixer Operator': '⚙️',
+    'Steel Fixer': '🔩',
+  };
+
   static const List<Map<String, String>> _jobs = [
     {'title': 'Mason', 'location': 'Noida', 'wage': 'Rs. 700/day'},
     {'title': 'Plumber', 'location': 'Ghaziabad', 'wage': 'Rs. 650/day'},
@@ -46,6 +61,8 @@ class JobListScreen extends StatelessWidget {
           itemCount: _jobs.length,
           itemBuilder: (context, index) {
             final job = _jobs[index];
+            final title = job['title'] ?? '';
+            final emoji = _jobEmojis[title] ?? '💼';
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
@@ -62,7 +79,7 @@ class JobListScreen extends StatelessWidget {
               child: ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 title: Text(
-                  job['title'] ?? '',
+                  '$emoji $title',
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
                 subtitle: Padding(
