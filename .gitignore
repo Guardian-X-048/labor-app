@@ -1,0 +1,19 @@
+# Node
+backend/node_modules/
+database/node_modules/
+backend/.env
+
+# Flutter
+frontend/.dart_tool/
+frontend/.idea/
+frontend/.metadata
+frontend/build/
+frontend/*.iml
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.packages
+frontend/.pub/
+
+# Misc
+.DS_Store
+Thumbs.db
