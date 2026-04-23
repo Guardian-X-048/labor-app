@@ -6,7 +6,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)?.settings.arguments;
-    final userData = args is Map<String, String> ? args : <String, String>{};
+    final userData = args is Map<String, dynamic> ? args : <String, dynamic>{};
     final fullName = userData['fullName'] ?? 'Worker Account';
     final countryCode = userData['countryCode'] ?? '+91';
     final phone = userData['phone'] ?? '9999999999';
@@ -60,7 +60,7 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(height: 14),
                     Text(
                       fullName,
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
                     ),
                     const SizedBox(height: 4),
                     const Text('Active worker profile', style: TextStyle(color: Color(0xFF64748B))),
@@ -88,6 +88,21 @@ class ProfileScreen extends StatelessWidget {
                       leading: const Icon(Icons.fact_check_outlined),
                       title: const Text('Verification Status'),
                       subtitle: Text(aadhaarStatus),
+                    ),
+                    const Divider(height: 20),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.payments_outlined),
+                      title: const Text('Payment History Details'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.pushNamed(context, '/payment-history'),
+                    ),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.work_history_outlined),
+                      title: const Text('Work History Details'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.pushNamed(context, '/work-history'),
                     ),
                   ],
                 ),

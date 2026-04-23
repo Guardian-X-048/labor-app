@@ -8,9 +8,13 @@ const router = express.Router();
 
 router.post('/signup', async (req, res) => {
   try {
-    const { name, phone, password } = req.body;
+    const { name, phone, password, role = 'worker' } = req.body;
     if (!name || !phone || !password) {
       return res.status(400).json({ message: 'name, phone and password are required' });
+    }
+
+    if (!['worker', 'employer'].includes(role)) {
+      return res.status(400).json({ message: 'role must be worker or employer' });
     }
 
     const existingUser = await User.findOne({ phone });
@@ -19,11 +23,22 @@ router.post('/signup', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, phone, password: hashedPassword });
+    const user = await User.create({ name, phone, password: hashedPassword, role });
+
+    const token = jwt.sign({ id: user._id, phone: user.phone, role: user.role }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
+    });
 
     return res.status(201).json({
       message: 'Signup successful',
-      user: { id: user._id, name: user.name, phone: user.phone },
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        phone: user.phone,
+        role: user.role,
+        aadhaarVerified: user.aadhaarVerified,
+      },
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -47,7 +62,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: user._id, phone: user.phone }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id, phone: user.phone, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: '7d',
     });
 
@@ -58,6 +73,7 @@ router.post('/login', async (req, res) => {
         id: user._id,
         name: user.name,
         phone: user.phone,
+        role: user.role,
         aadhaarVerified: user.aadhaarVerified,
       },
     });

@@ -49,3 +49,22 @@ flutter run
 - `GET /api/jobs`
 - `POST /api/jobs` (auth required)
 - `POST /api/aadhaar/verify` (auth required)
+
+## Custom Domain Setup
+
+Use your main domain for frontend and a subdomain for API:
+
+- Frontend: `https://laborlinks.in` and `https://www.laborlinks.in`
+- Backend API: `https://api.laborlinks.in`
+
+Recommended deployment flow:
+
+1. Deploy backend (Render, Railway, or similar) and copy the backend public URL.
+2. Deploy Flutter web frontend and copy the frontend public URL.
+3. In your domain DNS panel, add records:
+	- `@` -> A/CNAME as required by your frontend host
+	- `www` -> CNAME to frontend host target
+	- `api` -> CNAME to backend host target
+4. In backend environment variables, set `CORS_ORIGINS` to:
+	- `https://laborlinks.in,https://www.laborlinks.in`
+5. Enable HTTPS/SSL in both hosting dashboards and wait for DNS propagation.

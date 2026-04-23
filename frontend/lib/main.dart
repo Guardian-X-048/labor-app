@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
 import 'screens/aadhaar_verify.dart';
+import 'screens/employer_dashboard.dart';
 import 'screens/job_detail.dart';
+import 'screens/job_applicants.dart';
 import 'screens/job_list.dart';
+import 'screens/job_post.dart';
 import 'screens/login.dart';
+import 'screens/my_applications.dart';
+import 'screens/payment_history.dart';
 import 'screens/profile.dart';
 import 'screens/signup.dart';
+import 'screens/work_history.dart';
 
 void main() {
   runApp(const LaborApp());
@@ -78,8 +84,14 @@ class LaborApp extends StatelessWidget {
         '/signup': (context) => const SignupScreen(),
         '/aadhaar-verify': (context) => const AadhaarVerifyScreen(),
         '/jobs': (context) => const JobListScreen(),
+        '/job-post': (context) => const JobPostScreen(),
         '/job-detail': (context) => const JobDetailScreen(),
+        '/my-applications': (context) => const MyApplicationsScreen(),
+        '/employer-dashboard': (context) => const EmployerDashboardScreen(),
+        '/job-applicants': (context) => const JobApplicantsScreen(),
         '/profile': (context) => const ProfileScreen(),
+        '/payment-history': (context) => const PaymentHistoryScreen(),
+        '/work-history': (context) => const WorkHistoryScreen(),
       },
     );
   }

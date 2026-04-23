@@ -14,8 +14,25 @@ router.get('/', async (_req, res) => {
   }
 });
 
+router.get('/my', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'employer') {
+      return res.status(403).json({ message: 'Only employers can view posted jobs' });
+    }
+
+    const jobs = await Job.find({ postedBy: req.user.id }).sort({ createdAt: -1 });
+    return res.json(jobs);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
 router.post('/', auth, async (req, res) => {
   try {
+    if (req.user.role !== 'employer') {
+      return res.status(403).json({ message: 'Only employers can post jobs' });
+    }
+
     const { title, description, location, wage } = req.body;
     if (!title || !description || !location || !wage) {
       return res

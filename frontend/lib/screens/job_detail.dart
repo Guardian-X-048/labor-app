@@ -1,12 +1,75 @@
 import 'package:flutter/material.dart';
 
-class JobDetailScreen extends StatelessWidget {
+import '../services/api_service.dart';
+
+class JobDetailScreen extends StatefulWidget {
   const JobDetailScreen({super.key});
+
+  @override
+  State<JobDetailScreen> createState() => _JobDetailScreenState();
+}
+
+class _JobDetailScreenState extends State<JobDetailScreen> {
+  bool _isApplying = false;
+
+  Future<void> _applyToJob(Map<String, dynamic> userData, Map<String, dynamic> job) async {
+    final token = userData['token']?.toString() ?? '';
+    final role = userData['role']?.toString() ?? 'worker';
+    final jobId = job['_id']?.toString() ?? '';
+
+    if (role != 'worker') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Only worker accounts can apply.')),
+      );
+      return;
+    }
+
+    if (token.isEmpty || jobId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Missing session or job details.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isApplying = true;
+    });
+
+    try {
+      await ApiService.applyToJob(token: token, jobId: jobId);
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Applied successfully.')),
+      );
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isApplying = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)?.settings.arguments;
-    final job = args is Map<String, String> ? args : <String, String>{};
+    final payload = args is Map<String, dynamic> ? args : <String, dynamic>{};
+    final job = payload['job'] is Map<String, dynamic>
+        ? Map<String, dynamic>.from(payload['job'] as Map)
+        : payload;
+    final userData = payload['user'] is Map<String, dynamic>
+        ? Map<String, dynamic>.from(payload['user'] as Map)
+        : <String, dynamic>{};
+    final role = userData['role']?.toString() ?? 'worker';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Job Details')),
@@ -77,16 +140,36 @@ class JobDetailScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 22),
+                    if ((job['description']?.toString().isNotEmpty ?? false)) ...[
+                      const Text(
+                        'Description',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        job['description'].toString(),
+                        style: const TextStyle(color: Color(0xFF475569)),
+                      ),
+                      const SizedBox(height: 22),
+                    ],
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Applied successfully (mock).')),
-                          );
-                        },
+                        onPressed: _isApplying
+                            ? null
+                            : () {
+                                if (role != 'worker') {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Employer account cannot apply to jobs.'),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                _applyToJob(userData, job);
+                              },
                         icon: const Icon(Icons.send_rounded),
-                        label: const Text('Apply Now'),
+                        label: Text(_isApplying ? 'Applying...' : 'Apply Now'),
                       ),
                     ),
                   ],

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../services/api_service.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -12,6 +14,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String _countryCode = '+91';
+  bool _isLoading = false;
 
   static const List<String> _countryCodes = ['+91', '+1', '+44', '+971'];
 
@@ -22,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _login(BuildContext context) {
+  Future<void> _login(BuildContext context) async {
     final phone = _phoneController.text.trim();
     final password = _passwordController.text;
 
@@ -33,15 +36,45 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    Navigator.pushNamed(
-      context,
-      '/jobs',
-      arguments: {
-        'countryCode': _countryCode,
-        'phone': phone,
-        'password': password,
-      },
-    );
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await ApiService.login(phone: phone, password: password);
+      final user = response['user'] as Map<String, dynamic>;
+      final token = response['token'] as String;
+
+      if (!context.mounted) {
+        return;
+      }
+
+      Navigator.pushNamed(
+        context,
+        '/jobs',
+        arguments: {
+          'countryCode': _countryCode,
+          'phone': phone,
+          'fullName': user['name'] ?? '',
+          'role': user['role'] ?? 'worker',
+          'aadhaarStatus': (user['aadhaarVerified'] == true) ? 'Verified' : 'Pending',
+          'token': token,
+        },
+      );
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -161,8 +194,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 20),
                           ElevatedButton(
-                            onPressed: () => _login(context),
-                            child: const Text('Login'),
+                            onPressed: _isLoading ? null : () => _login(context),
+                            child: Text(_isLoading ? 'Signing in...' : 'Login'),
                           ),
                           const SizedBox(height: 6),
                           TextButton(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../services/api_service.dart';
+
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
@@ -13,6 +15,8 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String _countryCode = '+91';
+  String _role = 'worker';
+  bool _isLoading = false;
 
   static const List<String> _countryCodes = ['+91', '+1', '+44', '+971'];
 
@@ -24,7 +28,7 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  void _continue(BuildContext context) {
+  Future<void> _continue(BuildContext context) async {
     final fullName = _nameController.text.trim();
     final phone = _phoneController.text.trim();
     final password = _passwordController.text;
@@ -50,16 +54,53 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
-    Navigator.pushNamed(
-      context,
-      '/aadhaar-verify',
-      arguments: {
-        'fullName': fullName,
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await ApiService.signup(
+        name: fullName,
+        phone: phone,
+        password: password,
+        role: _role,
+      );
+
+      final user = response['user'] as Map<String, dynamic>;
+      final token = response['token'] as String;
+
+      if (!context.mounted) {
+        return;
+      }
+
+      final userArgs = {
+        'fullName': user['name'] ?? fullName,
         'countryCode': _countryCode,
         'phone': phone,
-        'password': password,
-      },
-    );
+        'role': user['role'] ?? _role,
+        'token': token,
+        'aadhaarStatus': (user['aadhaarVerified'] == true) ? 'Verified' : 'Pending',
+      };
+
+      if (_role == 'employer') {
+        Navigator.pushNamed(context, '/jobs', arguments: userArgs);
+      } else {
+        Navigator.pushNamed(context, '/aadhaar-verify', arguments: userArgs);
+      }
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -108,7 +149,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       const SizedBox(height: 18),
                       TextField(
                         controller: _nameController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Full Name',
                           prefixIcon: Icon(Icons.badge_outlined),
                         ),
@@ -168,10 +209,30 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         obscureText: true,
                       ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        initialValue: _role,
+                        decoration: const InputDecoration(
+                          labelText: 'Account Type',
+                          prefixIcon: Icon(Icons.groups_outlined),
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: 'worker', child: Text('Worker')),
+                          DropdownMenuItem(value: 'employer', child: Text('Employer')),
+                        ],
+                        onChanged: (value) {
+                          if (value == null) {
+                            return;
+                          }
+                          setState(() {
+                            _role = value;
+                          });
+                        },
+                      ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: () => _continue(context),
-                        child: const Text('Continue'),
+                        onPressed: _isLoading ? null : () => _continue(context),
+                        child: Text(_isLoading ? 'Creating account...' : 'Continue'),
                       ),
                     ],
                   ),

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../services/api_service.dart';
+
 class AadhaarVerifyScreen extends StatelessWidget {
   const AadhaarVerifyScreen({super.key});
 
-  void _verifyAndContinue(BuildContext context, TextEditingController aadhaarController) {
+  Future<void> _verifyAndContinue(BuildContext context, TextEditingController aadhaarController) async {
     final args = ModalRoute.of(context)?.settings.arguments;
-    final userData = args is Map<String, String> ? Map<String, String>.from(args) : <String, String>{};
+    final userData = args is Map<String, dynamic> ? Map<String, dynamic>.from(args) : <String, dynamic>{};
+    final token = userData['token'] as String?;
     final aadhaar = aadhaarController.text.trim();
 
     if (aadhaar.length != 12) {
@@ -16,8 +19,31 @@ class AadhaarVerifyScreen extends StatelessWidget {
       return;
     }
 
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Session expired. Please login again.')),
+      );
+      return;
+    }
+
+    try {
+      await ApiService.verifyAadhaar(token: token, aadhaarNumber: aadhaar);
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))),
+      );
+      return;
+    }
+
     userData['aadhaar'] = aadhaar;
     userData['aadhaarStatus'] = 'Verified';
+
+    if (!context.mounted) {
+      return;
+    }
 
     Navigator.pushNamed(context, '/jobs', arguments: userData);
   }
