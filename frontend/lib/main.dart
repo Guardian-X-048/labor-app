@@ -27,7 +27,7 @@ class LaborApp extends StatelessWidget {
     const secondary = Color(0xFFF97316);
 
     return MaterialApp(
-      title: 'Labor App',
+      title: 'LaborLinks',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
