@@ -6,6 +6,7 @@ import 'screens/job_detail.dart';
 import 'screens/job_applicants.dart';
 import 'screens/job_list.dart';
 import 'screens/job_post.dart';
+import 'screens/landing.dart';
 import 'screens/login.dart';
 import 'screens/my_applications.dart';
 import 'screens/payment_history.dart';
@@ -78,8 +79,9 @@ class LaborApp extends StatelessWidget {
           ),
         ),
       ),
-      initialRoute: '/login',
+      initialRoute: '/',
       routes: {
+        '/': (context) => const LandingScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
         '/aadhaar-verify': (context) => const AadhaarVerifyScreen(),

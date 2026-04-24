@@ -24,7 +24,6 @@ class _SignupScreenState extends State<SignupScreen>
   late AnimationController _fieldStaggerController;
   late Animation<double> _cardRotation;
   late Animation<double> _cardScale;
-  double _parallaxOffset = 0;
   List<Animation<double>> _fieldAnimations = [];
 
   static const List<String> _countryCodes = ['+91', '+1', '+44', '+971'];
@@ -164,20 +163,14 @@ class _SignupScreenState extends State<SignupScreen>
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      body: MouseRegion(
-        onHover: (event) {
-          setState(() {
-            _parallaxOffset = event.localPosition.dy / 100;
-          });
-        },
-        child: Container(
+      body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
               colors: [
                 const Color(0xFFFFEDD5),
-                const Color(0xFFFFF8ED).withOpacity(0.8),
+                const Color(0xFFFFF8ED).withValues(alpha: 0.8),
               ],
             ),
           ),
@@ -198,34 +191,38 @@ class _SignupScreenState extends State<SignupScreen>
                         builder: (context, child) {
                           final floatingY =
                               math.sin(_floatingController.value * 2 * math.pi) * 8;
-                          return Transform(
-                            alignment: Alignment.center,
-                            transform: Matrix4.identity()
-                              ..setEntry(3, 2, 0.001)
-                              ..translate(0.0, floatingY)
-                              ..rotateX(_cardRotation.value * 0.25)
-                              ..rotateY(_cardRotation.value * -0.15)
-                              ..scale(_cardScale.value),
-                            child: Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(24),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFFFB923C).withOpacity(0.2),
-                                    blurRadius: 40,
-                                    offset: Offset(0, 20 + (floatingY * 0.5)),
-                                    spreadRadius: 5,
+                          return Transform.translate(
+                            offset: Offset(0, floatingY),
+                            child: Transform.scale(
+                              scale: _cardScale.value,
+                              child: Transform(
+                                alignment: Alignment.center,
+                                transform: Matrix4.identity()
+                                  ..setEntry(3, 2, 0.001)
+                                  ..rotateX(_cardRotation.value * 0.25)
+                                  ..rotateY(_cardRotation.value * -0.15),
+                                child: Container(
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(24),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFFFB923C).withValues(alpha: 0.2),
+                                        blurRadius: 40,
+                                        offset: Offset(0, 20 + (floatingY * 0.5)),
+                                        spreadRadius: 5,
+                                      ),
+                                      BoxShadow(
+                                        color: const Color(0xFFFB923C).withValues(alpha: 0.05),
+                                        blurRadius: 80,
+                                        offset: const Offset(0, 40),
+                                      ),
+                                    ],
                                   ),
-                                  BoxShadow(
-                                    color: const Color(0xFFFB923C).withOpacity(0.05),
-                                    blurRadius: 80,
-                                    offset: const Offset(0, 40),
-                                  ),
-                                ],
+                                  child: child,
+                                ),
                               ),
-                              child: child,
                             ),
                           );
                         },
@@ -378,7 +375,6 @@ class _SignupScreenState extends State<SignupScreen>
             ),
           ),
         ),
-      ),
     );
   }
 
@@ -391,11 +387,13 @@ class _SignupScreenState extends State<SignupScreen>
           alignment: Alignment.topCenter,
           transform: Matrix4.identity()
             ..setEntry(3, 2, 0.001)
-            ..translate(0.0, animation.value)
             ..rotateX(-0.02),
-          child: Opacity(
-            opacity: (animation.value + 50) / 50,
-            child: child,
+          child: Transform.translate(
+            offset: Offset(0, animation.value),
+            child: Opacity(
+              opacity: (animation.value + 50) / 50,
+              child: child,
+            ),
           ),
         );
       },
@@ -413,7 +411,7 @@ class _SignupScreenState extends State<SignupScreen>
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFB923C).withOpacity(0.1),
+              color: const Color(0xFFFB923C).withValues(alpha: 0.1),
               blurRadius: 16,
               offset: const Offset(0, 6),
               spreadRadius: 1,
@@ -457,7 +455,7 @@ class _SignupScreenState extends State<SignupScreen>
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFB923C).withOpacity(0.25),
+                      color: const Color(0xFFFB923C).withValues(alpha: 0.25),
                       blurRadius: 24,
                       offset: const Offset(0, 12),
                       spreadRadius: 3,

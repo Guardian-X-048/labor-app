@@ -293,15 +293,15 @@ class _JobListScreenState extends State<JobListScreen> {
                 ? 'LaborLinks now blends the speed of Pronto with the trust-first service model of Urban Company.'
                 : 'LaborLinks now brings verified pros, upfront service options, and quick booking flows inspired by Urban Company and Pronto.',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               height: 1.4,
             ),
           ),
           const SizedBox(height: 16),
-          Wrap(
+          const Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: const [
+            children: [
               _FeatureChip(label: 'Verified experts', icon: Icons.verified_outlined),
               _FeatureChip(label: 'Live tracking', icon: Icons.navigation_outlined),
               _FeatureChip(label: 'Fast slots', icon: Icons.timer_outlined),
@@ -397,7 +397,7 @@ class _JobListScreenState extends State<JobListScreen> {
   }
 
   Widget _buildFeatureStrip() {
-    return Row(
+    return const Row(
       children: [
         Expanded(
           child: _FeatureMetricCard(
@@ -406,7 +406,7 @@ class _JobListScreenState extends State<JobListScreen> {
             icon: Icons.speed_outlined,
           ),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Expanded(
           child: _FeatureMetricCard(
             label: 'Trust score',
@@ -508,8 +508,8 @@ class _FeatureChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Chip(
-      backgroundColor: Colors.white.withOpacity(0.14),
-      side: BorderSide(color: Colors.white.withOpacity(0.2)),
+      backgroundColor: Colors.white.withValues(alpha: 0.14),
+      side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
       labelPadding: const EdgeInsets.symmetric(horizontal: 6),
       avatar: Icon(icon, color: Colors.white, size: 18),
       label: Text(

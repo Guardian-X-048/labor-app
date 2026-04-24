@@ -1,11 +1,11 @@
 {
-    "name": "labor_app_frontend",
-    "short_name": "labor_app_frontend",
+    "name": "LaborLinks",
+    "short_name": "LaborLinks",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0F766E",
+    "theme_color": "#0F766E",
+    "description": "LaborLinks - trusted labor and home services.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

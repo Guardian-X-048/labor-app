@@ -8,11 +8,15 @@ frontend/.dart_tool/
 frontend/.idea/
 frontend/.metadata
 frontend/build/
+frontend/firebase-debug.log
 frontend/*.iml
 frontend/.flutter-plugins
 frontend/.flutter-plugins-dependencies
 frontend/.packages
 frontend/.pub/
+
+# Generated analysis/artifacts
+graphify-out/
 
 # Misc
 .DS_Store

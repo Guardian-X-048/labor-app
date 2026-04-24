@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen>
               end: Alignment.bottomCenter,
               colors: [
                 const Color(0xFFD1FAE5),
-                const Color(0xFFFFF8ED).withOpacity(0.8)
+                const Color(0xFFFFF8ED).withValues(alpha: 0.8)
               ],
             ),
           ),
@@ -171,34 +171,38 @@ class _LoginScreenState extends State<LoginScreen>
                         builder: (context, child) {
                           final floatingY =
                               math.sin(_floatingController.value * 2 * math.pi) * 8;
-                          return Transform(
-                            alignment: Alignment.center,
-                            transform: Matrix4.identity()
-                              ..setEntry(3, 2, 0.001)
-                              ..translate(0.0, floatingY)
-                              ..rotateX(_cardRotation.value * 0.3)
-                              ..rotateY(_cardRotation.value * -0.2)
-                              ..scale(_cardScale.value),
-                            child: Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(24),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF0B3A37).withOpacity(0.15),
-                                    blurRadius: 40,
-                                    offset: Offset(0, 20 + (floatingY * 0.5)),
-                                    spreadRadius: 5,
+                          return Transform.translate(
+                            offset: Offset(0, floatingY),
+                            child: Transform.scale(
+                              scale: _cardScale.value,
+                              child: Transform(
+                                alignment: Alignment.center,
+                                transform: Matrix4.identity()
+                                  ..setEntry(3, 2, 0.001)
+                                  ..rotateX(_cardRotation.value * 0.3)
+                                  ..rotateY(_cardRotation.value * -0.2),
+                                child: Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(24),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFF0B3A37).withValues(alpha: 0.15),
+                                        blurRadius: 40,
+                                        offset: Offset(0, 20 + (floatingY * 0.5)),
+                                        spreadRadius: 5,
+                                      ),
+                                      BoxShadow(
+                                        color: const Color(0xFF0B3A37).withValues(alpha: 0.05),
+                                        blurRadius: 80,
+                                        offset: const Offset(0, 40),
+                                      ),
+                                    ],
                                   ),
-                                  BoxShadow(
-                                    color: const Color(0xFF0B3A37).withOpacity(0.05),
-                                    blurRadius: 80,
-                                    offset: const Offset(0, 40),
-                                  ),
-                                ],
+                                  child: child,
+                                ),
                               ),
-                              child: child,
                             ),
                           );
                         },
@@ -320,7 +324,7 @@ class _LoginScreenState extends State<LoginScreen>
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF0B3A37).withOpacity(0.08),
+              color: const Color(0xFF0B3A37).withValues(alpha: 0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -363,7 +367,7 @@ class _LoginScreenState extends State<LoginScreen>
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF0B3A37).withOpacity(0.2),
+                      color: const Color(0xFF0B3A37).withValues(alpha: 0.2),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                       spreadRadius: 2,
